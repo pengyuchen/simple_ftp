@@ -40,38 +40,58 @@ if __name__ == '__main__':
     if message == '':
       pass
 
-    # command for lls
+    # command lls
     elif message == 'lls':
       if '\n'.join(os.listdir('.')):
         print '\n'.join(os.listdir('.'))
 
-    # command for lpwd
+    # command lpwd
     elif message == 'lpwd':
       print os.getcwd()
 
-    # command for lcd
+    # command lcd
     elif re.match('lcd\s+(.+)$',message):
       arg = re.match('lcd\s+(.+)$',message).group(1)
       try: os.chdir(arg)
       except: print 'something error when execute lcd {}'.format(cmd,arg)
 
-    # command for put
+    # command put
     elif re.match('put\s+(.+)$',message):
-      client_socket.send(message)  
       file_name = re.match('put\s+(.+)$',message).group(1)
       if os.path.isfile(file_name):
-        f = open(file_name)
-        while True:
-          data = f.read(1024)
-          if not data:
-            break  
-          client_socket.send(data)
+        client_socket.send(message)
+        print 'start upload file {}...'.format(file_name)
+        time.sleep(1)
+        with open(file_name) as f:
+          while True:
+            data = f.read(1024)
+            if not data:
+              break  
+            client_socket.send(data)
         time.sleep(1)  
         client_socket.send("EOF")
         print client_socket.recv(1024)
       else:
         print 'file on client is not exist'
     
+    # command get
+    elif re.match('get\s+(.+)$',message):
+      client_socket.send(message)
+      status = client_socket.recv(1024)
+      if status == 'start download file...':
+        print status
+        file_name = re.match('get\s+(.+)$',message).group(1)
+        if os.path.isfile(file_name): os.remove(file_name)
+        with open(file_name,'w') as f:
+          while True:
+            data = client_socket.recv(1024)
+            if data == 'EOF':
+              break
+            f.write(data)
+        print 'successfully download {}'.format(file_name)
+      else:
+        print status
+
     # else
     else:  
       client_socket.send(message)

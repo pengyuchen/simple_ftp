@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import time
 import socket
 import argparse
 from thread import *
@@ -66,7 +67,24 @@ def threadWork(client, address):
             break
           f.write(data)
         client.send('successfully upload file {}'.format(file_name))
-              
+    
+    # command get
+    elif re.match('get\s+(.+)$',command):
+      file_name = re.match('get\s+(.+)$',command).group(1)
+      if os.path.isfile(file_name):
+        client.send('start download file...')
+        time.sleep(1)
+        with open(file_name) as f:
+          while True:
+            data = f.read(1024)
+            if not data:
+              break
+            client.send(data)
+        time.sleep(1)
+        client.send('EOF')
+      else:
+        client.send('file on server is not exist')
+
     # else
     else:
       client.send("unknown command or error format")
