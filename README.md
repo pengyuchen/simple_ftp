@@ -7,14 +7,14 @@ Run the following command:
 ```
 python server.py -p <port>
 ```
-<port> is a port number where the server will listen on this port. 
+`port` is a port number where the server will listen on this port. 
 
 ## Client
 Run the following command:
 ```
 python server.py -i <ip> -p <port>
 ```
-<ip> and <port> is the IP address and port number to the server
+`ip` and `port` is the IP address and port number to the server
 
 ## Usage
 - put [filename] : upload a file to the server’s working directory. If thename of the file already exists, overwrite the file.
